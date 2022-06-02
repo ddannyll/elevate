@@ -153,7 +153,7 @@ if currFloor ~= #floors and currFloor ~= 1 then
 end
 
 local f = fs.open("data/slaveData", 'w')
-f.write({floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace})
+f.write(textutils.serializeJSON({floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace}))
 f.close()
 
 parallel.waitForAll(listen, send)
