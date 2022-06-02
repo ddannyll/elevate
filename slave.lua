@@ -100,7 +100,6 @@ if modemFace == nil then
 end
 
 rednet.open(modemFace)
-redInt = peripheral.wrap(redIntFace)
 
 if currFloor == nil then
     print("Please enter the current floor (the one you are standing on)")
@@ -121,6 +120,7 @@ if currFloor ~= #floors or currFloor ~= 1 then
             redIntFace = read()
         end
     end
+    redInt = peripheral.wrap(redIntFace)
     
     if topPistonRed == nil then
         print("Please enter the face for top piston redstone")
