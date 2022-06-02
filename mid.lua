@@ -7,7 +7,7 @@ topPistonRed = "back"
 botPistonRed = "bottom"
 
 rednet.open("back")
-red = peripheral.wrap("bottom")
+redInt = peripheral.wrap("bottom")
 
 
 function setPistons(from)
@@ -17,16 +17,16 @@ function setPistons(from)
     end
     if from == "bot" then
         print('setpistons bot')
-        red.setOutput(topPistonRed, true)
-        red.setOutput(botPistonRed, false)
+        redInt.setOutput(topPistonRed, true)
+        redInt.setOutput(botPistonRed, false)
     elseif from == "top" then
         print('setpistons top')
-        red.setOutput(topPistonRed, false)
-        red.setOutput(botPistonRed, true)
+        redInt.setOutput(topPistonRed, false)
+        redInt.setOutput(botPistonRed, true)
     else
         print('setpistons clear')
-        red.setOutput(topPistonRed, false)
-        red.setOutput(botPistonRed, false)
+        redInt.setOutput(topPistonRed, false)
+        redInt.setOutput(botPistonRed, false)
     end
 end
 

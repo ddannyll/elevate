@@ -91,6 +91,10 @@ function Elevator:sendTo(floor)
         redstone.setOutput(self.redFace, false)
         sleep(0.1)
     end
+
+    print("dir "..direction.. " prevDir "..self.prevDirection)
+
+    self.currFloor = floor
     self.prevDirection = direction
 end
 
