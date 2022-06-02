@@ -72,9 +72,7 @@ function Elevator:sendTo(floor)
     if self.currFloor > floor then
         direction = 'down'
     end
-
-    msg = {action="set", floor=floor, direction=direction}
-    rednet.broadcast(textutils.serializeJSON(msg))
+    rednet.broadcast({action="send", floor=floor, direction=direction})
     
     if direction == self.prevDirection then
         sleep(0.1)
@@ -103,9 +101,10 @@ function main()
     rednet.open(Elevator.modemFace)
     while true do
         local _, msg = rednet.receive()
-        msg = textutils.unserializeJSON(msg)
-        if msg.action == 'req' then
+        if msg.action == 'request' then
             Elevator:sendTo(msg.floor)
+        elseif msg.action == 'getFloors' then
+            rednet.broadcast({action='sendDataFloors', floors=Elevator.floors})
         end
     end
 end
