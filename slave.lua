@@ -8,7 +8,6 @@ modemFace = nil
 redInt = nil
 
 function setPistons(direction)
-    print("setpistons "..direction)
     if currFloor == #floors or currFloor == 1 then
         return
     end
@@ -19,7 +18,6 @@ function setPistons(direction)
         redInt.setOutput(topPistonRed, false)
         redInt.setOutput(botPistonRed, true)
     else
-        print('setpistons clear')
         redInt.setOutput(topPistonRed, false)
         redInt.setOutput(botPistonRed, false)
     end
@@ -91,6 +89,22 @@ end
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 -- MAIN CODE
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+
+-- Load persistence
+if fs.exists('/data/slaveData') then
+    local f = fs.open('data/slaveData', 'r')
+    local data = textutils.unserializeJSON(f.readAll())
+    floors = data.floors
+    currFloor = data.currFloor
+    redIntFace = data.redIntFace
+    topPistonRed = data.topPistonRed
+    botPistonRed = data.botPistonRed
+    modemFace = data.modemFace
+    f.close()
+end
+
+
+-- Set globals if nil
 if modemFace == nil then
     print("Please enter the face for the modem")
     modemFace = read()
@@ -98,7 +112,6 @@ if modemFace == nil then
         modemFace = read()
     end
 end
-
 rednet.open(modemFace)
 
 if currFloor == nil then
@@ -112,7 +125,7 @@ if currFloor == nil then
     currFloor = tonumber(input)
 end
 
-if currFloor ~= #floors or currFloor ~= 1 then
+if currFloor ~= #floors and currFloor ~= 1 then
     if redIntFace == nil then
         print("Please enter the face for the redstone integrator")
         redIntFace = read()
@@ -138,4 +151,9 @@ if currFloor ~= #floors or currFloor ~= 1 then
         end
     end
 end
+
+local f = fs.open("data/slaveData", 'w')
+f.write({floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace})
+f.close()
+
 parallel.waitForAll(listen, send)
