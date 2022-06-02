@@ -1,4 +1,3 @@
-Rednet = nil
 
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 -- Elevator Object
@@ -66,10 +65,6 @@ function Elevator:init()
     self.redFace = data.redFace
     self.modemFace = data.modemFace
     f.close()
-    -- Open peripherals
-    print(data.modemFace)
-    Rednet = rednet.open(data.modemFace)
-    
 end
 
 function Elevator:sendTo(floor)
@@ -79,7 +74,7 @@ function Elevator:sendTo(floor)
     end
 
     msg = {action="set", floor=floor, direction=direction}
-    Rednet.broadcast(textutils.serializeJSON(msg))
+    rednet.broadcast(textutils.serializeJSON(msg))
     
     if direction == self.prevDirection then
         sleep(0.1)
@@ -105,8 +100,9 @@ end
 -- Main
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 function main()
+    rednet.open(Elevator.modemFace)
     while true do
-        local _, msg = Rednet.receive()
+        local _, msg = rednet.receive()
         msg = textutils.unserializeJSON(msg)
         if msg.action == 'req' then
             Elevator:sendTo(msg.floor)
