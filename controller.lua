@@ -67,6 +67,7 @@ function Elevator:init()
     self.modemFace = data.modemFace
     f.close()
     -- Open peripherals
+    print(data.modemFace)
     Rednet = rednet.open(data.modemFace)
     
 end
