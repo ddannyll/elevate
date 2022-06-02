@@ -32,6 +32,18 @@ function listen ()
             else
                 setPistons('none')
             end
+        elseif msg.action == 'changeFloor' then
+            if msg.floor == currFloor then
+                local f = fs.open("/data/slaveData", "r")
+                local data = textutils.unserializeJSON(f)
+                f.close()
+                data.currFloor = msg.newFloor
+                currFloor = msg.newFloor
+                f = fs.open("/data/slaveData", "w")
+                f.write(data)
+                f.close()
+                sleep(5) -- sleep to avoid changeFloor overlaps
+            end
         end
     end
 end
@@ -92,7 +104,7 @@ end
 
 -- Load persistence
 if fs.exists('/data/slaveData') then
-    local f = fs.open('data/slaveData', 'r')
+    local f = fs.open('/data/slaveData', 'r')
     local data = textutils.unserializeJSON(f.readAll())
     floors = data.floors
     currFloor = data.currFloor
@@ -152,8 +164,7 @@ if currFloor ~= #floors and currFloor ~= 1 then
     end
 end
 
-local f = fs.open("data/slaveData", 'w')
-print('...' .. {floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace})
+local f = fs.open("/data/slaveData", 'w')
 f.write(textutils.serializeJSON({floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace}))
 f.close()
 

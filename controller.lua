@@ -113,6 +113,40 @@ function main()
     end
 end
 
+function input()
+    while true do
+        print('commands: [+] Add Floor')
+        local input = read()
+            if input == '+' then
+                -- prompt for floor level
+                print('Please pick a floor index to add level to.')
+                promptFloor(Elevator.floors)
+                print('or ['..(#Elevator.floors + 1)..'] for a higher level')
+                local newFloor = tonumber(read())
+                while newFloor or newFloor < 1 or newFloor > #Elevator.floors + 1 do
+                    print("invalid selection")
+                    newFloor = tonumber(read())
+                end
+
+                if newFloor == currFloor then
+                    currFloor = currFloor + 1
+                end
+
+                print('Enter a floor name')
+                local floorName = read()
+                local i = newFloor
+                while i <= #Elevator.floors do
+                    rednet.broadcast({action='changeFloor', floor=i, newFloor=i+1})
+                    i = i + 1
+                end
+                table.insert(Elevator.floors, i, floorName)
+                local f = fs.open('/data/elevatorData', 'w')
+                f.write({Elevator.floors, Elevator.currFloor, Elevator.prevDirection, Elevator.redFace, Elevator.modemFace})
+                f.close()
+            end
+    end
+end
+
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 -- Helper Functions
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
