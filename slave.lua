@@ -91,6 +91,16 @@ end
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
 -- MAIN CODE
 -- .-.-.-..-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+if modemFace == nil then
+    print("Please enter the face for the modem")
+    modemFace = read()
+    while not validFace(modemFace) do
+        modemFace = read()
+    end
+end
+
+rednet.open(modemFace)
+redInt = peripheral.wrap(redIntFace)
 
 if currFloor == nil then
     print("Please enter the current floor (the one you are standing on)")
@@ -103,39 +113,29 @@ if currFloor == nil then
     currFloor = tonumber(input)
 end
 
-if redIntFace == nil then
-    print("Please enter the face for the redstone integrator")
-    redIntFace = read()
-    while not validFace(redIntFace) do
+if currFloor ~= #floors or currFloor ~= 1 then
+    if redIntFace == nil then
+        print("Please enter the face for the redstone integrator")
         redIntFace = read()
+        while not validFace(redIntFace) do
+            redIntFace = read()
+        end
     end
-end
-
-if topPistonRed == nil then
-    print("Please enter the face for top piston redstone")
-    topPistonRed = read()
-    while not validFace(topPistonRed) do
+    
+    if topPistonRed == nil then
+        print("Please enter the face for top piston redstone")
         topPistonRed = read()
+        while not validFace(topPistonRed) do
+            topPistonRed = read()
+        end
     end
-end
-
-if botPistonRed == nil then
-    print("Please enter the face for bottom piston redstone")
-    botPistonRed = read()
-    while not validFace(botPistonRed) do
+    
+    if botPistonRed == nil then
+        print("Please enter the face for bottom piston redstone")
         botPistonRed = read()
+        while not validFace(botPistonRed) do
+            botPistonRed = read()
+        end
     end
 end
-
-if modemFace == nil then
-    print("Please enter the face for the modem")
-    modemFace = read()
-    while not validFace(modemFace) do
-        modemFace = read()
-    end
-end
-
-rednet.open(modemFace)
-redInt = peripheral.wrap(redIntFace)
-
 parallel.waitForAll(listen, send)
