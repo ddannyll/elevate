@@ -73,7 +73,7 @@ function Elevator:sendTo(floor)
         direction = 'down'
     end
     rednet.broadcast({action="send", floor=floor, direction=direction})
-    
+    print('send to'.. floor ..' ' .. direction)
     if direction == self.prevDirection then
         sleep(0.1)
         redstone.setOutput(self.redFace, true)
@@ -108,6 +108,7 @@ function main()
         if msg.action == 'request' then
             Elevator:sendTo(msg.floor)
         elseif msg.action == 'getFloors' then
+            sleep(1)
             rednet.broadcast({action='sendDataFloors', floors=Elevator.floors})
         end
     end
@@ -123,15 +124,16 @@ function input()
                 promptFloor(Elevator.floors)
                 print('or ['..(#Elevator.floors + 1)..'] for a higher level')
                 local newFloor = tonumber(read())
-                while newFloor or newFloor < 1 or newFloor > #Elevator.floors + 1 do
+                while newFloor == nil or newFloor < 1 or newFloor > #Elevator.floors + 1 do
                     print("invalid selection")
                     newFloor = tonumber(read())
                 end
 
-                if newFloor == currFloor then
-                    currFloor = currFloor + 1
+                print(newFloor, currFloor)
+                if newFloor == Elevator.currFloor then
+                    Elevator.currFloor = Elevator.currFloor + 1
                 end
-
+                print(Elevator.currFloor)
                 print('Enter a floor name')
                 local floorName = read()
                 local i = newFloor
@@ -139,9 +141,9 @@ function input()
                     rednet.broadcast({action='changeFloor', floor=i, newFloor=i+1})
                     i = i + 1
                 end
-                table.insert(Elevator.floors, i, floorName)
+                table.insert(Elevator.floors, newFloor, floorName)
                 local f = fs.open('/data/elevatorData', 'w')
-                f.write({Elevator.floors, Elevator.currFloor, Elevator.prevDirection, Elevator.redFace, Elevator.modemFace})
+                f.write(textutils.serializeJSON({Elevator.floors, Elevator.currFloor, Elevator.prevDirection, Elevator.redFace, Elevator.modemFace}))
                 f.close()
             end
     end
@@ -169,4 +171,4 @@ end
 
 Elevator:init()
 
-main()
+parallel.waitForAll(input, main)
