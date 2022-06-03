@@ -4,8 +4,16 @@ redIntFace = nil
 topPistonRed = nil
 botPistonRed = nil
 modemFace = nil
+monitorDirection = nil
+mon = nil
 
 redInt = nil
+
+if not fs.exists("touchpoint") then
+    shell.run("pastebin get pFHeia96 touchpoint")
+end
+os.loadAPI('touchpoint')
+
 
 function setPistons(direction)
     if currFloor == #floors or currFloor == 1 then
@@ -58,16 +66,41 @@ function listen ()
 end
 
 function send ()
+    -- while true do
+    --     rednet.broadcast({action='getFloors'})
+    --     promptFloor()
+    --     print("Please enter a floor...")
+    --     local input = read()
+    --     if validFloor(tonumber(input)) then
+    --         rednet.broadcast({action='request', floor=tonumber(input)})
+    --     else
+    --         print("Invalid selection")
+    --     end
+    -- end
     while true do
         rednet.broadcast({action='getFloors'})
-        promptFloor()
-        print("Please enter a floor...")
-        local input = read()
-        if validFloor(tonumber(input)) then
-            rednet.broadcast({action='request', floor=tonumber(input)})
-        else
-            print("Invalid selection")
+        local t = touchpoint.new(monitorDirection)
+        local maxX, maxY = mon.getSize()
+
+        for i, v in pairs(floors) do
+            local str = "["..i.."]"..v
+            while string.len(str) < maxX do
+                str = str..' '
+            end
+            t:add(str, nil, 1, #floors + 1 - i, maxX, #floors + 1 - i, colors.red, colors.lime)
         end
+        t:draw()
+        
+        local event, p1 = t:handleEvents(os.pullEvent())
+        while event ~= "button_click" do
+            event, p1 = t:handleEvents(os.pullEvent())
+        end
+        
+        local chosenFloor = tonumber(string.sub(p1, 2,2))
+        t:flash(p1)
+        local endNumChar = string.find(p1, ']') - 1
+        print(tonumber(string.sub(p1, 2, endNumChar)))
+        rednet.broadcast({action='request', floor=tonumber(string.sub(p1, 2, endNumChar))})
     end
 end
 
@@ -109,6 +142,7 @@ if fs.exists('/data/slaveData') then
     topPistonRed = data.topPistonRed
     botPistonRed = data.botPistonRed
     modemFace = data.modemFace
+    monitorDirection = data.monitorDirection
     f.close()
 end
 
@@ -163,8 +197,20 @@ if currFloor ~= #floors and currFloor ~= 1 then
     end
 end
 
+if monitorDirection == nil then
+    print("Please enter the face for the monitor")
+    monitorDirection = read()
+    while not validFace(monitorDirection) do
+        monitorDirection = read()
+    end
+end
+
 local f = fs.open("/data/slaveData", 'w')
-f.write(textutils.serializeJSON({floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace}))
+f.write(textutils.serializeJSON({floors=floors, currFloor=currFloor, redIntFace=redIntFace, topPistonRed=topPistonRed, botPistonRed=botPistonRed, modemFace=modemFace, monitorDirection=monitorDirection}))
 f.close()
+
+mon = peripheral.wrap(monitorDirection)
+mon.setTextScale(0.5)
+
 
 parallel.waitForAll(listen, send)
