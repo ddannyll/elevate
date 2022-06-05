@@ -87,7 +87,11 @@ function send ()
             while string.len(str) < maxX do
                 str = str..' '
             end
-            t:add(str, nil, 1, #floors + 1 - i, maxX, #floors + 1 - i, colors.red, colors.lime)
+            local inactiveColor = colors.red
+            if currFloor == i then
+                inactiveColor = colors.gray
+            end
+            t:add(str, nil, 1, #floors + 1 - i, maxX, #floors + 1 - i, inactiveColor, colors.lime)
         end
         t:draw()
         
